@@ -1,0 +1,27 @@
+#!/usr/bin/bash
+
+set -e
+
+cd /
+
+# Add test user/password
+htpasswd -b -c /etc/httpd/passwords "user1" "password1"
+chmod 644 /etc/httpd/conf.d/proxy.conf
+
+# Start apache
+httpd -k start
+
+ip address show
+
+echo "
+Anonymous proxy listening at port 8080
+Authenticated (basic - user1/password1) proxy listening at port 8081
+"
+
+if [ -t 0 ] ; then
+	echo 'Starting interactive shell.'
+	/usr/bin/bash
+else
+	echo 'Go loop.'
+	while true ; do sleep 1000 & wait $! ; done
+fi
